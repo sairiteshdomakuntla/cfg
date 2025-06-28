@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import StudentDetails from './StudentDetails';
 
 const EducatorDashboard = () => {
   const [students, setStudents] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -73,6 +75,19 @@ const EducatorDashboard = () => {
       setLoading(false);
     }
   };
+
+  const handleViewStudentDetails = (studentId) => {
+    setSelectedStudent(studentId);
+  };
+
+  const handleBackToList = () => {
+    setSelectedStudent(null);
+  };
+
+  // If a student is selected, show the student details page
+  if (selectedStudent) {
+    return <StudentDetails studentId={selectedStudent} onBack={handleBackToList} />;
+  }
 
   return (
     <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
@@ -309,7 +324,7 @@ const EducatorDashboard = () => {
                   <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Email</th>
                   <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Age</th>
                   <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Class</th>
-                  <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Created At</th>
+                  <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -322,7 +337,20 @@ const EducatorDashboard = () => {
                     <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>{student.age}</td>
                     <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>{student.class}</td>
                     <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
-                      {new Date(student.createdAt).toLocaleDateString()}
+                      <button
+                        onClick={() => handleViewStudentDetails(student._id)}
+                        style={{
+                          backgroundColor: '#008080',
+                          color: 'white',
+                          padding: '6px 12px',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '14px'
+                        }}
+                      >
+                        View Details
+                      </button>
                     </td>
                   </tr>
                 ))}

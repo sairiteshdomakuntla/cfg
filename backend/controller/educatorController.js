@@ -141,8 +141,68 @@ const getAllStudents = async (req, res) => {
     }
 };
 
-// Make sure this exports the updated functions with student profiles
+const getStudentById = async (req, res) => {
+    // Check if requester is educator
+    if (req.user.role !== 'Educator') {
+        return res.status(403).json({
+            message: "Only educators can view student details",
+            status: "error"
+        });
+    }
+
+    const { id } = req.params;
+
+    if (!id) {
+        return res.status(400).json({
+            message: "Student ID is required",
+            status: "error"
+        });
+    }
+
+    try {
+        // Find the student user
+        const student = await User.findOne({ _id: id, role: 'Student' }).select('-password');
+        
+        if (!student) {
+            return res.status(404).json({
+                message: "Student not found",
+                status: "error"
+            });
+        }
+        
+        // Find the student profile
+        const studentProfile = await StudentProfile.findOne({ userId: id });
+        
+        // Combine user and profile data
+        const enrichedStudent = {
+            _id: student._id,
+            name: student.name,
+            username: student.username,
+            email: student.email,
+            role: student.role,
+            createdAt: student.createdAt,
+            studentId: studentProfile?.studentId || 'N/A',
+            age: studentProfile?.age || 'N/A',
+            class: studentProfile?.class || 'N/A'
+        };
+        
+        res.status(200).json({
+            message: "Student details retrieved successfully",
+            status: "success",
+            data: enrichedStudent
+        });
+    } catch (err) {
+        console.error("Error retrieving student details:", err);
+        return res.status(500).json({
+            message: "Internal server error",
+            status: "error"
+        });
+    }
+};
+
+// Update the exports to include the new function
 module.exports = {
     createStudent,
-    getAllStudents
+    getAllStudents,
+    getStudentById
 };
