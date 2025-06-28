@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Student from './Student'; // Assuming you have a Student component for editing
 
 const StudentDetails = ({ studentId, onBack }) => {
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isChange, setIsChange] = useState(false);
+  console.log(student)
 
+  const handleSwitch = () => {
+    console.log('Switching to edit mode');
+    setIsChange(!isChange);
+  }
   useEffect(() => {
     fetchStudentDetails();
   }, [studentId]);
@@ -27,7 +34,9 @@ const StudentDetails = ({ studentId, onBack }) => {
       setLoading(false);
     }
   };
-
+  if (isChange) {
+    return <Student studentId={studentId} username={student.username} />
+  }
   if (loading) {
     return (
       <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -61,6 +70,18 @@ const StudentDetails = ({ studentId, onBack }) => {
         >
           Back to Students List
         </button>
+        <button
+          style={{
+            backgroundColor: '#008080',
+            color: 'white',
+            padding: '8px 16px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Add Details
+        </button>
       </div>
     );
   }
@@ -83,16 +104,7 @@ const StudentDetails = ({ studentId, onBack }) => {
         >
           Back to Students List
         </button>
-      </div>
-    );
-  }
-
-  return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ color: '#008080' }}>Student Details</h2>
         <button
-          onClick={onBack}
           style={{
             backgroundColor: '#008080',
             color: 'white',
@@ -102,8 +114,44 @@ const StudentDetails = ({ studentId, onBack }) => {
             cursor: 'pointer'
           }}
         >
-          Back to Students List
+          Add Details
         </button>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
+      <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2 style={{ color: '#008080' }}>Student Details</h2>
+        <div className='flex gap-2'>
+          <button
+            onClick={onBack}
+            style={{
+              backgroundColor: '#008080',
+              color: 'white',
+              padding: '8px 16px',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Back to Students List
+          </button>
+          <button
+            onClick={handleSwitch}
+            style={{
+              backgroundColor: '#008080',
+              color: 'white',
+              padding: '8px 16px',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Add Details
+          </button>
+        </div>
       </div>
       
       <div style={{
