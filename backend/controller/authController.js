@@ -7,69 +7,10 @@ const User = require('../models/User');
 
 dotenv.config();
 
-const register = async (req, res) => {
-    const { name, username, password, role } = req.body;
-
-    if (!name || !username || !password) {
-        return res.status(400).json({
-            message: "Username, password, and name are required",
-            status: "error"
-        });
-    }
-
-    // Validate role
-    const validRoles = ['Student', 'Educator', 'Admin'];
-    const userRole = role && validRoles.includes(role) ? role : 'Student';
-
-    try {
-        const existingUser = await User.findOne({ username });
-        if (existingUser) {
-            return res.status(409).json({
-                message: "Username already exists",
-                status: "error"
-            });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        
-        const newUser = new User({
-            name,
-            username,
-            password: hashedPassword,
-            role: userRole
-        });
-
-        await newUser.save();
-
-        const token = jwt.sign(
-            { username, role: userRole },
-            process.env.JWT_SECRET,
-            { expiresIn: '7d' }
-        );
-
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        });
-
-        res.status(201).json({
-            message: "User registered successfully",
-            status: "success",
-            data: { username, role: userRole }
-        });
-    } catch (err) {
-        console.error("Error registering user:", err);
-        return res.status(500).json({
-            message: "Internal server error",
-            status: "error"
-        });
-    }
-};
-
 const login = async (req, res) => {
     const { username, password } = req.body;
+
+    console.log('Login attempt:', { username }); // Debug log
 
     if (!username || !password) {
         return res.status(400).json({
@@ -80,6 +21,8 @@ const login = async (req, res) => {
 
     try {
         const user = await User.findOne({ username });
+        console.log('User found:', user ? 'Yes' : 'No'); // Debug log
+        
         if (!user) {
             return res.status(401).json({
                 message: "Invalid username or password",
@@ -88,6 +31,8 @@ const login = async (req, res) => {
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
+        console.log('Password valid:', isPasswordValid); // Debug log
+        
         if (!isPasswordValid) {
             return res.status(401).json({
                 message: "Invalid username or password",
@@ -107,6 +52,8 @@ const login = async (req, res) => {
             sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
+
+        console.log('Login successful for:', username, 'Role:', user.role); // Debug log
 
         res.status(200).json({
             message: "Login successful",
@@ -140,7 +87,7 @@ const isAuthenticated = (req, res) => {
         return res.json({
             message: "User is authenticated",
             status: "success",
-            data: { username: req.body.username, role: req.body.role }
+            data: { username: req.user.username, role: req.user.role }
         });
     } catch (error) {
         return res.status(401).json({
@@ -151,7 +98,6 @@ const isAuthenticated = (req, res) => {
 }
 
 module.exports = {
-    register,
     login,
     logout,
     isAuthenticated

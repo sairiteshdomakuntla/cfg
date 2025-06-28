@@ -6,6 +6,8 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const authRouter = require('./routes/api/auth');
 const userRouter = require('./routes/api/user');
+const adminRouter = require('./routes/api/admin');
+const educatorRouter = require('./routes/api/educator');
 
 dotenv.config();
 
@@ -53,6 +55,8 @@ app.get('/', (req, res) => {
 // API Routes
 app.use('/auth', authRouter);
 app.use('/user', userRouter);
+app.use('/admin', adminRouter);
+app.use('/educator', educatorRouter);
 
 // Start server
 app.listen(PORT, () => {

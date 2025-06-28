@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import { AppContext } from '../context/AppContext.jsx';
 import axios from 'axios';
 
-const Login = () => {
+const Login = ({ onLoginSuccess }) => {
   const [formData, setFormData] = useState({
     username: '', 
-    password: '', 
-    role: 'Student'
+    password: ''
   });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -31,6 +30,23 @@ const Login = () => {
       setLoading(true);
       const response = await axios.post('http://localhost:3000/auth/login', formData, {
         withCredentials: true
+
+      });
+
+      if (response.data.status === 'success') {
+        console.log('Login successful:', response.data);
+        onLoginSuccess(response.data.data);
+      }
+    } catch (error) {
+      console.error('Login error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        statusText: error.response?.statusText
+      });
+      setError(error.response?.data?.message || 'Login failed. Please check your credentials.');
+    } finally {
+
       })
       setError(null); // Clear any previous errors
       setIsLoggedIn(true);
