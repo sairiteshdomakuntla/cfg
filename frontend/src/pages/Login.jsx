@@ -8,8 +8,8 @@ const Login = () => {
     role: 'Student'
   });
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -17,13 +17,34 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
+    
     if(!formData.username || !formData.password) {
       setError('Username and password are required');
       return;
     }
-    // Add your login logic here
-    // const response = await axios.post('http://localhost:5000/api/login', formData)
 
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.post('http://localhost:3000/auth/login', {
+        username: formData.username,
+        password: formData.password
+      }, {
+        withCredentials: true
+      });
+
+      if (response.data.status === 'success') {
+        console.log('Login successful:', response.data);
+        // Handle successful login (redirect, etc.)
+        // You can check the role from response.data.data.role
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError(error.response?.data?.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -116,66 +137,40 @@ const Login = () => {
           />
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          <label style={{ 
-            color: "#008080",
-            fontWeight: "500",
-            fontSize: "14px"
+        {error && (
+          <div style={{
+            textAlign: "center",
+            color: "#dc2626",
+            fontSize: "14px",
+            backgroundColor: "#fee2e2",
+            padding: "8px",
+            borderRadius: "4px"
           }}>
-            Role
-          </label>
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-              fontSize: "14px",
-              color: "#333",
-              backgroundColor: "#fff",
-              cursor: "pointer",
-              transition: "border 0.3s",
-              outline: "none",
-              appearance: "none",
-              backgroundImage: "url(\"data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23008080' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e\")",
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "right 10px center",
-              backgroundSize: "16px"
-            }}
-            onFocus={(e) => e.target.style.borderColor = "#008080"}
-            onBlur={(e) => e.target.style.borderColor = "#ccc"}
-          >
-            <option value="Student">Student</option>
-            <option value="Educator">Educator</option>
-            <option value="Admin">Admin</option>
-          </select>
-        </div>
-        <div className="text-center text-red-500">{error}</div>
+            {error}
+          </div>
+        )}
+
         <button
           type="submit"
+          disabled={loading}
           style={{
             padding: "12px",
             borderRadius: "6px",
             border: "none",
-            background: "#008080",
+            background: loading ? "#ccc" : "#008080",
             color: "#fff",
             fontWeight: "600",
-            cursor: "pointer",
+            cursor: loading ? "not-allowed" : "pointer",
             fontSize: "16px",
             transition: "background 0.3s",
             marginTop: "8px"
           }}
-          onMouseOver={(e) => e.target.style.background = "#006666"}
-          onMouseOut={(e) => e.target.style.background = "#008080"}
+          onMouseOver={(e) => !loading && (e.target.style.background = "#006666")}
+          onMouseOut={(e) => !loading && (e.target.style.background = "#008080")}
         >
-          Login
+          {loading ? 'Logging in...' : 'Login'}
         </button>
-        
       </form>
-      
     </div>
   );
 };

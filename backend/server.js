@@ -2,11 +2,20 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const authRouter = require('./routes/api/auth'); // No .js needed in CommonJS
-const userRouter = require('./routes/api/user'); // No .js needed in CommonJS
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const authRouter = require('./routes/api/auth');
+const userRouter = require('./routes/api/user');
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// MongoDB Atlas connection (removed deprecated options)
+mongoose.connect(process.env.MONGODB_URI)
+.then(() => console.log('Connected to MongoDB Atlas'))
+.catch(err => console.error('MongoDB connection error:', err));
 
 // Middleware
 app.use(express.json());
@@ -43,7 +52,7 @@ app.get('/', (req, res) => {
 
 // API Routes
 app.use('/auth', authRouter);
-app.use('/user', userRouter); // No .js needed in CommonJS
+app.use('/user', userRouter);
 
 // Start server
 app.listen(PORT, () => {
