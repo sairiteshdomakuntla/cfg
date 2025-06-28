@@ -1,10 +1,11 @@
 const express = require('express');
-const { createStudent, getAllStudents } = require('../../controller/educatorController');
+const { createStudent, getAllStudents, getStudentById } = require('../../controller/educatorController');
 const userAuth = require('../../middleware/userAuth');
 
 const router = express.Router();
 
 router.post('/create-student', userAuth, createStudent);
 router.get('/students', userAuth, getAllStudents);
+router.get('/students/:id', userAuth, getStudentById);  // New route for individual student
 
 module.exports = router;
