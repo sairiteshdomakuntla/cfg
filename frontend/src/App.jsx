@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import Login from './pages/Login'
 import AdminDashboard from './pages/AdminDashboard'
+import EducatorDashboard from './pages/EducatorDashboard'
 import axios from 'axios'
 
 function App() {
@@ -78,7 +79,39 @@ function App() {
     );
   }
 
-  // For now, show a placeholder for other roles
+  // Show educator dashboard
+  if (user.role === 'Educator') {
+    return (
+      <div>
+        <div style={{ 
+          padding: '10px 20px', 
+          backgroundColor: '#008080', 
+          color: 'white',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <span>Welcome, {user.username} (Educator)</span>
+          <button 
+            onClick={handleLogout}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: 'transparent',
+              color: 'white',
+              border: '1px solid white',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Logout
+          </button>
+        </div>
+        <EducatorDashboard />
+      </div>
+    );
+  }
+
+  // For now, show a placeholder for other roles (Student)
   return (
     <div>
       <div style={{ 
