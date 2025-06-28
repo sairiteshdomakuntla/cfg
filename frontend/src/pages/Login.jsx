@@ -4,14 +4,14 @@ import axios from 'axios';
 
 const Login = ({ onLoginSuccess }) => {
   const [formData, setFormData] = useState({
-    username: '', 
+    username: '',
     password: ''
   });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
 
-  const {isLoggedIn, setIsLoggedIn, role, setRole, user, setUser} = React.useContext(AppContext);
+  const { isLoggedIn, setIsLoggedIn, role, setRole, user, setUser } = React.useContext(AppContext);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,8 +19,8 @@ const Login = ({ onLoginSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if(!formData.username || !formData.password) {
+
+    if (!formData.username || !formData.password) {
       setError('Username and password are required');
       return;
     }
@@ -36,6 +36,13 @@ const Login = ({ onLoginSuccess }) => {
       if (response.data.status === 'success') {
         console.log('Login successful:', response.data);
         onLoginSuccess(response.data.data);
+        setError(null); // Clear any previous errors
+        setIsLoggedIn(true);
+        setLoading(false);
+        console.log('User logged in:', response.data);
+        setRole(response.data.data.role);
+        console.log('User role:', response.data.data.role);
+        setUser(response.data.data);
       }
     } catch (error) {
       console.error('Login error details:', {
@@ -45,30 +52,20 @@ const Login = ({ onLoginSuccess }) => {
         statusText: error.response?.statusText
       });
       setError(error.response?.data?.message || 'Login failed. Please check your credentials.');
-    } finally {
-
-      })
-      setError(null); // Clear any previous errors
-      setIsLoggedIn(true);
-      setLoading(false);
-      console.log('User logged in:', response.data);
-      setRole(response.data.data.role);
-      console.log('User role:', response.data.data.role);
-      setUser(response.data.data);
-      // Handle successful login (e.g., redirect or update state)
-    } catch (err) {
-      console.error('Login failed:', err);
     }
-    // const response = await axios.post('http://localhost:5000/api/login', formData)
+
+    // Handle successful login (e.g., redirect or update state)
+ 
+  // const response = await axios.post('http://localhost:5000/api/login', formData)
 
 
-    setError(null);
+  setError(null);
 
-    
-  };
 
-  return (
-    <>
+};
+
+return (
+  <>
     <div style={{
       minHeight: '100vh',
       display: 'flex',
@@ -88,8 +85,8 @@ const Login = ({ onLoginSuccess }) => {
         flexDirection: "column",
         gap: "20px"
       }}>
-        <h2 style={{ 
-          textAlign: "center", 
+        <h2 style={{
+          textAlign: "center",
           color: "#008080",
           marginBottom: "8px",
           fontSize: "28px"
@@ -101,9 +98,9 @@ const Login = ({ onLoginSuccess }) => {
           color: "#666",
           marginBottom: "16px"
         }}>Please login to your account</p>
-        
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          <label style={{ 
+          <label style={{
             color: "#008080",
             fontWeight: "500",
             fontSize: "14px"
@@ -131,7 +128,7 @@ const Login = ({ onLoginSuccess }) => {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          <label style={{ 
+          <label style={{
             color: "#008080",
             fontWeight: "500",
             fontSize: "14px"
@@ -193,8 +190,8 @@ const Login = ({ onLoginSuccess }) => {
         </button>
       </form>
     </div>
-    </>
-  );
+  </>
+);
 };
 
 export default Login;
