@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { register, login, logout, isAuthenticated } = require('../../controllers/authController');
+const { register, login, logout, isAuthenticated } = require('../../controller/authController');
 const userAuth = require('../../middleware/userAuth'); // No .js needed in CommonJS
 
 
