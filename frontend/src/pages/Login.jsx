@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { AppContext } from '../context/AppContext.jsx';
 import axios from 'axios';
 
 const Login = () => {
@@ -19,7 +20,6 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
     
     if(!formData.username || !formData.password) {
       setError('Username and password are required');
@@ -28,15 +28,17 @@ const Login = () => {
 
     // Add your login logic here
     try {
-      const response = await axios.post('http://localhost:5000/api/login', formData, {
+      setLoading(true);
+      const response = await axios.post('http://localhost:3000/auth/login', formData, {
         withCredentials: true
-      });
-      console.log('Login successful:', response.data);
+      })
       setError(null); // Clear any previous errors
       setIsLoggedIn(true);
-      console.log('User logged in:', response.data.user);
-      setRole(response.data.role);
-      setUser(response.data.user);
+      setLoading(false);
+      console.log('User logged in:', response.data);
+      setRole(response.data.data.role);
+      console.log('User role:', response.data.data.role);
+      setUser(response.data.data);
       // Handle successful login (e.g., redirect or update state)
     } catch (err) {
       console.error('Login failed:', err);
@@ -44,31 +46,13 @@ const Login = () => {
     // const response = await axios.post('http://localhost:5000/api/login', formData)
 
 
-    setLoading(true);
     setError(null);
 
-    try {
-      const response = await axios.post('http://localhost:3000/auth/login', {
-        username: formData.username,
-        password: formData.password
-      }, {
-        withCredentials: true
-      });
-
-      if (response.data.status === 'success') {
-        console.log('Login successful:', response.data);
-        // Handle successful login (redirect, etc.)
-        // You can check the role from response.data.data.role
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      setError(error.response?.data?.message || 'Login failed');
-    } finally {
-      setLoading(false);
-    }
+    
   };
 
   return (
+    <>
     <div style={{
       minHeight: '100vh',
       display: 'flex',
@@ -193,6 +177,7 @@ const Login = () => {
         </button>
       </form>
     </div>
+    </>
   );
 };
 
