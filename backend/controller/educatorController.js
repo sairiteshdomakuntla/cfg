@@ -143,6 +143,7 @@ const getAllStudents = async (req, res) => {
 
 const getStudentById = async (req, res) => {
     // Check if requester is educator
+    console.log("Here");
     if (req.user.role !== 'Educator') {
         return res.status(403).json({
             message: "Only educators can view student details",
@@ -200,9 +201,73 @@ const getStudentById = async (req, res) => {
     }
 };
 
+const updateStudent = async (req, res) => {
+  console.log("Update student request received");
+  try {
+    const {
+      studentId,
+      school,
+      parent_phone,
+      family_no,
+      family_income,
+      marks,
+      feedbacks
+    } = req.body;
+
+    console.log(req.body);
+
+    const student = await StudentProfile.findOne({userId: studentId});
+    if (!student) {
+        console.log("Student not found with ID:", studentId);
+      return res.status(404).json({ error: 'Student not found' });
+    }
+
+
+    if (school !== undefined && school !== null) student.school = school;
+    if (parent_phone !== undefined && parent_phone !== null) student.parent_phone = parent_phone;
+    if (family_no !== undefined && family_no !== null) student.family_no = parseInt(family_no);
+    if (family_income !== undefined && family_income !== null) student.family_income = parseFloat(family_income);
+
+    // 🔧 Fix: Initialize marks if not present
+    if (!student.marks) {
+      student.marks = { maths: [], science: [], social: [] };
+    }
+
+    // Update subject-wise marks
+    if (marks && typeof marks === 'object') {
+      ['maths', 'science', 'social'].forEach((subject) => {
+        if (marks[subject] !== undefined && marks[subject] !== null) {
+          if (!Array.isArray(student.marks[subject])) {
+            student.marks[subject] = [];
+          }
+          student.marks[subject].push(Number(marks[subject]));
+        }
+      });
+    }
+
+    // Append feedbacks
+    if (Array.isArray(feedbacks)) {
+      if (!Array.isArray(student.feedbacks)) {
+        student.feedbacks = [];
+      }
+      student.feedbacks.push(...feedbacks);
+    }
+
+    const updated = await student.save();
+    console.log("Student updated successfully:", updated);
+    res.status(200).json({ message: 'Student updated successfully', student: updated });
+
+  } catch (error) {
+    console.error('Update error:', error);
+    res.status(500).json({ error: 'Server error while updating student' });
+  }
+};
+
+
 // Update the exports to include the new function
 module.exports = {
     createStudent,
     getAllStudents,
-    getStudentById
+    getStudentById,
+    updateStudent,
 };
