@@ -82,12 +82,17 @@ const logout = (req, res) => {
     });
 };
 
+// Update the isAuthenticated function
 const isAuthenticated = (req, res) => {
     try {
         return res.json({
             message: "User is authenticated",
             status: "success",
-            data: { username: req.user.username, role: req.user.role }
+            data: { 
+                username: req.user.username, 
+                role: req.user.role,
+                name: req.user.name
+            }
         });
     } catch (error) {
         return res.status(401).json({

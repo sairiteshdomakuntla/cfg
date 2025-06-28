@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
-const userAuth = (req, res, next) => {
+const userAuth = async (req, res, next) => {
     const token = req.cookies.token || req.headers['authorization']?.split(' ')[1];
     if (!token) {
         return res.status(401).json({ message: 'Unauthorized' });
@@ -10,17 +11,23 @@ const userAuth = (req, res, next) => {
         if (!decode) {
             return res.status(401).json({ message: 'Unauthorized' });
         }
+        
         if(decode.username) {
-            // Store user info in req.user instead of req.body
-            req.user = {
-                username: decode.username,
-                role: decode.role || 'Student'
-            };
+            // Get the full user from database
+            const user = await User.findOne({ username: decode.username }).select('-password');
+            
+            if (!user) {
+                return res.status(401).json({ message: 'Unauthorized' });
+            }
+            
+            // Store the full user object in req.user
+            req.user = user;
             next();
         } else {
             return res.status(401).json({ message: 'Unauthorized' });
         }
     } catch (error) {
+        console.error('Auth error:', error);
         return res.status(401).json({ message: 'Unauthorized' });
     }
 }
