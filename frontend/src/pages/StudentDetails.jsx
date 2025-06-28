@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Student from './Student'; // Assuming you have a Student component for editing
+import StudentCharts from '../components/StudentCharts';
 
 const StudentDetails = ({ studentId, onBack }) => {
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isChange, setIsChange] = useState(false);
-  console.log(student)
 
   const handleSwitch = () => {
-    console.log('Switching to edit mode');
     setIsChange(!isChange);
   }
   useEffect(() => {
@@ -223,6 +222,7 @@ const StudentDetails = ({ studentId, onBack }) => {
           <p>Academic data coming soon...</p>
         </div>
       </div>
+      <StudentCharts studentId={studentId} />
     </div>
   );
 };

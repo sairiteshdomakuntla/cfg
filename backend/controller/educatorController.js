@@ -263,6 +263,69 @@ const updateStudent = async (req, res) => {
   }
 };
 
+const visualdata = async (req, res) => {
+    const { studentId } = req.body;
+    console.log(studentId);
+    if (!studentId) {
+        return res.status(400).json({
+            message: "Student ID is required",
+            status: "error"
+        });
+    }
+
+    try {
+        // Get student profile
+        const studentProfile = await StudentProfile.findOne({ userId: studentId });
+
+        if (!studentProfile) {
+            return res.status(404).json({
+                message: "Student not found",
+                status: "error"
+            });
+        }
+
+        const subjects = ['maths', 'science', 'social'];
+
+        // All students
+        const allStudents = await StudentProfile.find({});
+
+        // Students from same school
+        const schoolStudents = await StudentProfile.find({ school: studentProfile.school });
+
+        const calculateAverage = (students, subject) => {
+            const values = students.map(s => s.marks?.[subject]?.[1] || 0);
+            const total = values.reduce((sum, val) => sum + val, 0);
+            return values.length ? Math.round(total / values.length) : 0;
+        };
+
+        const overallAverages = {};
+        const schoolAverages = {};
+
+        subjects.forEach(subject => {
+            overallAverages[subject] = calculateAverage(allStudents, subject);
+            schoolAverages[subject] = calculateAverage(schoolStudents, subject);
+        });
+
+        res.status(200).json({
+            message: "Student data retrieved successfully",
+            status: "success",
+            data: {
+                student: studentProfile,
+                averages: {
+                    overall: overallAverages,
+                    school: schoolAverages
+                }
+            }
+        });
+    } catch (err) {
+        console.error("Error retrieving student data:", err);
+        return res.status(500).json({
+            message: "Internal server error",
+            status: "error"
+        });
+    }
+};
+
 
 // Update the exports to include the new function
 module.exports = {
@@ -270,4 +333,5 @@ module.exports = {
     getAllStudents,
     getStudentById,
     updateStudent,
+    visualdata
 };
