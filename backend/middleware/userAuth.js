@@ -5,13 +5,14 @@ const userAuth = (req, res, next) => {
     if (!token) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
-    try{
+    try {
         const decode = jwt.verify(token, process.env.JWT_SECRET);
         if (!decode) {
             return res.status(401).json({ message: 'Unauthorized' });
         }
         if(decode.username) {
-            req.body = {
+            // Store user info in req.user instead of req.body
+            req.user = {
                 username: decode.username,
                 role: decode.role || 'Student'
             };

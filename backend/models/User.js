@@ -10,6 +10,13 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    email: {
+        type: String,
+        // Make it unique but not required
+        unique: true,
+        sparse: true, // This allows null/undefined values to not trigger unique constraint
+        default: null
+    },
     password: {
         type: String,
         required: true

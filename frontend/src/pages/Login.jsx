@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const Login = () => {
+const Login = ({ onLoginSuccess }) => {
   const [formData, setFormData] = useState({
     username: '', 
-    password: '', 
-    role: 'Student'
+    password: ''
   });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -16,7 +15,6 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
     
     if(!formData.username || !formData.password) {
       setError('Username and password are required');
@@ -36,12 +34,16 @@ const Login = () => {
 
       if (response.data.status === 'success') {
         console.log('Login successful:', response.data);
-        // Handle successful login (redirect, etc.)
-        // You can check the role from response.data.data.role
+        onLoginSuccess(response.data.data);
       }
     } catch (error) {
-      console.error('Login error:', error);
-      setError(error.response?.data?.message || 'Login failed');
+      console.error('Login error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        statusText: error.response?.statusText
+      });
+      setError(error.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
