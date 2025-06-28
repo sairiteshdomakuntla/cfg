@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const StudentProfile = require('../models/StudentProfile');
+const mongoose = require('mongoose');
+
 
 const createStudent = async (req, res) => {
     const { name, username, password, email, age, class: studentClass, studentId } = req.body;
@@ -22,11 +24,11 @@ const createStudent = async (req, res) => {
 
     try {
         // Check if user or studentId already exists
-        const existingUser = await User.findOne({ 
+        const existingUser = await User.findOne({
             $or: [
                 { username },
                 { email }
-            ] 
+            ]
         });
 
         if (existingUser) {
@@ -46,7 +48,7 @@ const createStudent = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        
+
         // Create the user account
         const newStudent = new User({
             name,
@@ -72,11 +74,11 @@ const createStudent = async (req, res) => {
         res.status(201).json({
             message: "Student created successfully",
             status: "success",
-            data: { 
+            data: {
                 name: newStudent.name,
                 username: newStudent.username,
                 studentId: studentProfile.studentId,
-                role: newStudent.role 
+                role: newStudent.role
             }
         });
     } catch (err) {
@@ -100,17 +102,17 @@ const getAllStudents = async (req, res) => {
     try {
         // Get all students with their profiles
         const students = await User.find({ role: 'Student' }).select('-password');
-        
+
         // Get student profiles and create a map for easy lookup
         const studentProfiles = await StudentProfile.find({
             userId: { $in: students.map(student => student._id) }
         });
-        
+
         const profileMap = {};
         studentProfiles.forEach(profile => {
             profileMap[profile.userId.toString()] = profile;
         });
-        
+
         // Combine user and profile data
         const enrichedStudents = students.map(student => {
             const profile = profileMap[student._id.toString()];
@@ -126,7 +128,7 @@ const getAllStudents = async (req, res) => {
                 class: profile?.class || 'N/A'
             };
         });
-        
+
         res.status(200).json({
             message: "Students retrieved successfully",
             status: "success",
@@ -143,7 +145,6 @@ const getAllStudents = async (req, res) => {
 
 const getStudentById = async (req, res) => {
     // Check if requester is educator
-    console.log("Here");
     if (req.user.role !== 'Educator') {
         return res.status(403).json({
             message: "Only educators can view student details",
@@ -163,17 +164,17 @@ const getStudentById = async (req, res) => {
     try {
         // Find the student user
         const student = await User.findOne({ _id: id, role: 'Student' }).select('-password');
-        
+
         if (!student) {
             return res.status(404).json({
                 message: "Student not found",
                 status: "error"
             });
         }
-        
+
         // Find the student profile
         const studentProfile = await StudentProfile.findOne({ userId: id });
-        
+
         // Combine user and profile data
         const enrichedStudent = {
             _id: student._id,
@@ -186,7 +187,7 @@ const getStudentById = async (req, res) => {
             age: studentProfile?.age || 'N/A',
             class: studentProfile?.class || 'N/A'
         };
-        
+
         res.status(200).json({
             message: "Student details retrieved successfully",
             status: "success",
@@ -202,65 +203,65 @@ const getStudentById = async (req, res) => {
 };
 
 const updateStudent = async (req, res) => {
-  console.log("Update student request received");
-  try {
-    const {
-      studentId,
-      school,
-      parent_phone,
-      family_no,
-      family_income,
-      marks,
-      feedbacks
-    } = req.body;
+    console.log("Update student request received");
+    try {
+        const {
+            studentId,
+            school,
+            parent_phone,
+            family_no,
+            family_income,
+            marks,
+            feedbacks
+        } = req.body;
 
-    console.log(req.body);
+        console.log(req.body);
 
-    const student = await StudentProfile.findOne({userId: studentId});
-    if (!student) {
-        console.log("Student not found with ID:", studentId);
-      return res.status(404).json({ error: 'Student not found' });
-    }
-
-
-    if (school !== undefined && school !== null) student.school = school;
-    if (parent_phone !== undefined && parent_phone !== null) student.parent_phone = parent_phone;
-    if (family_no !== undefined && family_no !== null) student.family_no = parseInt(family_no);
-    if (family_income !== undefined && family_income !== null) student.family_income = parseFloat(family_income);
-
-    // 🔧 Fix: Initialize marks if not present
-    if (!student.marks) {
-      student.marks = { maths: [], science: [], social: [] };
-    }
-
-    // Update subject-wise marks
-    if (marks && typeof marks === 'object') {
-      ['maths', 'science', 'social'].forEach((subject) => {
-        if (marks[subject] !== undefined && marks[subject] !== null) {
-          if (!Array.isArray(student.marks[subject])) {
-            student.marks[subject] = [];
-          }
-          student.marks[subject].push(Number(marks[subject]));
+        const student = await StudentProfile.findOne({ userId: studentId });
+        if (!student) {
+            console.log("Student not found with ID:", studentId);
+            return res.status(404).json({ error: 'Student not found' });
         }
-      });
+
+
+        if (school !== undefined && school !== null) student.school = school;
+        if (parent_phone !== undefined && parent_phone !== null) student.parent_phone = parent_phone;
+        if (family_no !== undefined && family_no !== null) student.family_no = parseInt(family_no);
+        if (family_income !== undefined && family_income !== null) student.family_income = parseFloat(family_income);
+
+        // 🔧 Fix: Initialize marks if not present
+        if (!student.marks) {
+            student.marks = { maths: [], science: [], social: [] };
+        }
+
+        // Update subject-wise marks
+        if (marks && typeof marks === 'object') {
+            ['maths', 'science', 'social'].forEach((subject) => {
+                if (marks[subject] !== undefined && marks[subject] !== null) {
+                    if (!Array.isArray(student.marks[subject])) {
+                        student.marks[subject] = [];
+                    }
+                    student.marks[subject].push(Number(marks[subject]));
+                }
+            });
+        }
+
+        // Append feedbacks
+        if (Array.isArray(feedbacks)) {
+            if (!Array.isArray(student.feedbacks)) {
+                student.feedbacks = [];
+            }
+            student.feedbacks.push(...feedbacks);
+        }
+
+        const updated = await student.save();
+        console.log("Student updated successfully:", updated);
+        res.status(200).json({ message: 'Student updated successfully', student: updated });
+
+    } catch (error) {
+        console.error('Update error:', error);
+        res.status(500).json({ error: 'Server error while updating student' });
     }
-
-    // Append feedbacks
-    if (Array.isArray(feedbacks)) {
-      if (!Array.isArray(student.feedbacks)) {
-        student.feedbacks = [];
-      }
-      student.feedbacks.push(...feedbacks);
-    }
-
-    const updated = await student.save();
-    console.log("Student updated successfully:", updated);
-    res.status(200).json({ message: 'Student updated successfully', student: updated });
-
-  } catch (error) {
-    console.error('Update error:', error);
-    res.status(500).json({ error: 'Server error while updating student' });
-  }
 };
 
 const visualdata = async (req, res) => {
@@ -275,15 +276,18 @@ const visualdata = async (req, res) => {
 
     try {
         // Get student profile
-        const studentProfile = await StudentProfile.findOne({ userId: studentId });
 
+        const studentProfile = await StudentProfile.findOne({ userId: studentId });
+        
+        console.log("Student Profile:", studentProfile);
         if (!studentProfile) {
+            console.log("Student profile not found for userId:", studentId);
             return res.status(404).json({
                 message: "Student not found",
                 status: "error"
             });
         }
-
+        console.log("here")
         const subjects = ['maths', 'science', 'social'];
 
         // All students

@@ -31,6 +31,7 @@ const StudentCharts = ({ studentId }) => {
   const termLabels = ['Term 1', 'Term 2'];
 
   useEffect(() => {
+    console.log('Fetching data for studentId:', studentId);
     const fetchData = async () => {
       try {
         const res = await axios.post(
