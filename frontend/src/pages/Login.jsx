@@ -10,6 +10,9 @@ const Login = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
+
+  const {isLoggedIn, setIsLoggedIn, role, setRole, user, setUser} = React.useContext(AppContext);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -22,6 +25,24 @@ const Login = () => {
       setError('Username and password are required');
       return;
     }
+
+    // Add your login logic here
+    try {
+      const response = await axios.post('http://localhost:5000/api/login', formData, {
+        withCredentials: true
+      });
+      console.log('Login successful:', response.data);
+      setError(null); // Clear any previous errors
+      setIsLoggedIn(true);
+      console.log('User logged in:', response.data.user);
+      setRole(response.data.role);
+      setUser(response.data.user);
+      // Handle successful login (e.g., redirect or update state)
+    } catch (err) {
+      console.error('Login failed:', err);
+    }
+    // const response = await axios.post('http://localhost:5000/api/login', formData)
+
 
     setLoading(true);
     setError(null);
