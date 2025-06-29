@@ -7,7 +7,7 @@ import { ArrowDownTrayIcon } from "@heroicons/react/24/solid";
 const prompt = /* md */ `
 You are a current‑affairs quiz generator.
 
-1. Search the web for major India news from the last 7 days (include cricket).
+1. Search the web for major India news from the last 7 days (include cricket).
 2. Write exactly 5 multiple‑choice questions.
    • Four options each, label them A) B) C) D).
    • Provide the correct option *label* (e.g., "B)").
