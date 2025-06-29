@@ -49,10 +49,11 @@ const corsOptions = {
 };
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173','https://cfg-chi.vercel.app'],
+  origin: 'https://cfg-chi.vercel.app',
   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   allowedHeaders: 'Content-Type,Authorization'
+
 }));
 
 // Basic route
