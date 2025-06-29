@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); 
 
-const whitelist = ['http://localhost:3000', 'http://localhost:5173','https://cfg-chi.vercel.app'];
+const whitelist = ['http://localhost:3000', 'http://localhost:5173','https://cfg-chi.vercel.app','https://vision-global.onrender.com'];
 // const credentials = (req, res, next) => {
 //   console.log('Req server:',req.headers.origin);
 //   const origin = req.headers.origin;
