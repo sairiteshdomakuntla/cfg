@@ -33,6 +33,9 @@ const credentials = (req, res, next) => {
  // }
   next();
 };
+
+app.use
+
 app.use(credentials);
 
 const corsOptions = {
@@ -46,7 +49,12 @@ const corsOptions = {
   optionsSuccessStatus: 200
 };
 
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: '*',
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+}));
 
 // Basic route
 app.get('/', (req, res) => {
