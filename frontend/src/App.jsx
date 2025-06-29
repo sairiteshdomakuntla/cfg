@@ -4,11 +4,15 @@ import Login from './pages/Login'
 import AdminDashboard from './pages/AdminDashboard'
 import EducatorDashboard from './pages/EducatorDashboard'
 import axios from 'axios'
+import UserDashboard from './pages/UserDashboard'
+import QuiztoPdf from "./components/QuizToPDF";
+
 
 
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showQuiz, setShowQuiz] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -52,30 +56,70 @@ function App() {
   if (user.role === 'Admin') {
     return (
       <div>
-        <div style={{ 
-          padding: '10px 20px', 
-          backgroundColor: '#008080', 
+        <div style={{
+          padding: '10px 20px',
+          backgroundColor: '#008080',
           color: 'white',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <span>Welcome, {user.username} (Admin)</span>
-          <button 
-            onClick={handleLogout}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: 'transparent',
-              color: 'white',
-              border: '1px solid white',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Logout
-          </button>
+          <span className='font-bold'>Vision Global Empowerment</span>
+          <div className='flex gap-2'>
+
+            <button
+              onClick={() => setQuiz(true)}
+              style={{
+                padding: "8px 16px",
+                backgroundColor: "white",
+                color: "#008080",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              Quiz → PDF
+            </button>
+            <button
+              onClick={handleLogout}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: 'transparent',
+                color: 'white',
+                border: '1px solid white',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Logout
+            </button>
+          </div>
+
         </div>
-        <AdminDashboard />
+        {showQuiz ? (
+          <div style={{ padding: "20px" }}>
+            <QuiztoPdf />
+            <button
+              onClick={() => setShowQuiz(false)}
+              style={{
+                marginTop: "10px",
+                padding: "6px 12px",
+                backgroundColor: "#e11d48",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              Close
+            </button>
+          </div>
+        ) : (
+
+          <AdminDashboard username={user.username} />
+        )}
+
+        {/* Welcome, {user.username} (Admin) */}
       </div>
     );
   }
@@ -84,30 +128,68 @@ function App() {
   if (user.role === 'Educator') {
     return (
       <div>
-        <div style={{ 
-          padding: '10px 20px', 
-          backgroundColor: '#008080', 
+        <div style={{
+          padding: '10px 20px',
+          backgroundColor: '#008080',
           color: 'white',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
           <span>Welcome, {user.username} (Educator)</span>
-          <button 
-            onClick={handleLogout}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: 'transparent',
-              color: 'white',
-              border: '1px solid white',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Logout
-          </button>
+          <div className='flex gap-2'>
+
+            <button
+              onClick={() => setShowQuiz(true)}
+              style={{
+                padding: "8px 16px",
+                backgroundColor: "white",
+                color: "#008080",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              Quiz → PDF
+            </button>
+            <button
+              onClick={handleLogout}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: 'transparent',
+                color: 'white',
+                border: '1px solid white',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Logout
+            </button>
+          </div>
         </div>
-        <EducatorDashboard />
+        {showQuiz ? (
+          <div style={{ padding: "20px" }}>
+            <QuiztoPdf />
+            <button
+              onClick={() => setShowQuiz(false)}
+              style={{
+                marginTop: "10px",
+                padding: "6px 12px",
+                backgroundColor: "#e11d48",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              Close
+            </button>
+          </div>
+        ) : (
+
+
+          <EducatorDashboard />
+        )}
       </div>
     );
   }
@@ -115,16 +197,16 @@ function App() {
   // For now, show a placeholder for other roles (Student)
   return (
     <div>
-      <div style={{ 
-        padding: '10px 20px', 
-        backgroundColor: '#008080', 
+      <div style={{
+        padding: '10px 20px',
+        backgroundColor: '#008080',
         color: 'white',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center'
       }}>
         <span>Welcome, {user.username} ({user.role})</span>
-        <button 
+        <button
           onClick={handleLogout}
           style={{
             padding: '8px 16px',
@@ -138,10 +220,7 @@ function App() {
           Logout
         </button>
       </div>
-      <div style={{ padding: '20px' }}>
-        <h2>{user.role} Dashboard</h2>
-        <p>Dashboard for {user.role} role is coming soon...</p>
-      </div>
+      <UserDashboard />
     </div>
   );
 }

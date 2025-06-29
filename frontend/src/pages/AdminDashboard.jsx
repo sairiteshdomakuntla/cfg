@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import AdminSidebar from '../components/AdminSidebar';
 
-const AdminDashboard = () => {
+const AdminDashboard = ({username}) => {
   const [educators, setEducators] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -53,7 +54,7 @@ const AdminDashboard = () => {
         setSuccess('Educator created successfully!');
         setFormData({ name: '', username: '', password: '' });
         setShowCreateForm(false);
-        fetchEducators(); // Refresh the list
+        fetchEducators();
       }
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to create educator');
@@ -63,172 +64,137 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-      <h1 style={{ color: '#008080', marginBottom: '30px' }}>Admin Dashboard</h1>
-      
-      {error && (
-        <div style={{
-          backgroundColor: '#fee2e2',
-          color: '#dc2626',
-          padding: '12px',
-          borderRadius: '6px',
-          marginBottom: '20px'
-        }}>
-          {error}
+    <div className="flex min-h-screen">
+      <AdminSidebar />
+
+      <main className="flex-1 p-8 bg-gray-50">
+        <h1 className="text-3xl font-bold mb-4 text-teal-700">Welcome {username}</h1>
+        <p className="text-gray-600 mb-8">Admin Dashboard - Manage Educators & Centers</p>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-gradient-to-r from-teal-500 to-teal-700 p-4 rounded text-white">
+            <h2 className="text-xl font-bold">20</h2>
+            <p>Centers</p>
+          </div>
+          <div className="bg-gradient-to-r from-cyan-400 to-cyan-600 p-4 rounded text-white">
+            <h2 className="text-xl font-bold">{educators.length}</h2>
+            <p>Educators</p>
+          </div>
+          <div className="bg-gradient-to-r from-teal-500 to-teal-700 p-4 rounded text-white">
+            <h2 className="text-xl font-bold">259</h2>
+            <p>Students</p>
+          </div>
+          <div className="bg-gradient-to-r from-cyan-400 to-cyan-600 p-4 rounded text-white">
+            <h2 className="text-xl font-bold">79%</h2>
+            <p>Avg Progress</p>
+          </div>
         </div>
-      )}
 
-      {success && (
-        <div style={{
-          backgroundColor: '#dcfce7',
-          color: '#16a34a',
-          padding: '12px',
-          borderRadius: '6px',
-          marginBottom: '20px'
-        }}>
-          {success}
-        </div>
-      )}
-
-      <div style={{ marginBottom: '30px' }}>
-        <button
-          onClick={() => setShowCreateForm(!showCreateForm)}
-          style={{
-            backgroundColor: '#008080',
-            color: 'white',
-            padding: '12px 24px',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '16px'
-          }}
-        >
-          {showCreateForm ? 'Cancel' : 'Add New Educator'}
-        </button>
-      </div>
-
-      {showCreateForm && (
-        <div style={{
-          backgroundColor: '#f9fafb',
-          padding: '24px',
-          borderRadius: '8px',
-          marginBottom: '30px',
-          border: '1px solid #e5e7eb'
-        }}>
-          <h3 style={{ marginBottom: '20px', color: '#008080' }}>Create New Educator</h3>
-          <form onSubmit={handleCreateEducator}>
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500' }}>
-                Name:
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                required
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px',
-                  fontSize: '14px'
-                }}
-              />
-            </div>
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500' }}>
-                Username:
-              </label>
-              <input
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleInputChange}
-                required
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px',
-                  fontSize: '14px'
-                }}
-              />
-            </div>
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500' }}>
-                Password:
-              </label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px',
-                  fontSize: '14px'
-                }}
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                backgroundColor: loading ? '#ccc' : '#008080',
-                color: 'white',
-                padding: '12px 24px',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                fontSize: '16px'
-              }}
-            >
-              {loading ? 'Creating...' : 'Create Educator'}
-            </button>
-          </form>
-        </div>
-      )}
-
-      <div>
-        <h3 style={{ marginBottom: '20px', color: '#008080' }}>All Educators</h3>
-        {educators.length === 0 ? (
-          <p>No educators found.</p>
-        ) : (
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            overflow: 'hidden',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-          }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead style={{ backgroundColor: '#f3f4f6' }}>
-                <tr>
-                  <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Name</th>
-                  <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Username</th>
-                  <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Role</th>
-                  <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Created At</th>
-                </tr>
-              </thead>
-              <tbody>
-                {educators.map((educator) => (
-                  <tr key={educator._id}>
-                    <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>{educator.name}</td>
-                    <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>{educator.username}</td>
-                    <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>{educator.role}</td>
-                    <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
-                      {new Date(educator.createdAt).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {error && (
+          <div className="bg-red-100 text-red-700 p-4 rounded mb-4">
+            {error}
           </div>
         )}
-      </div>
+
+        {success && (
+          <div className="bg-green-100 text-green-700 p-4 rounded mb-4">
+            {success}
+          </div>
+        )}
+
+        {/* Add Educator Button */}
+        <div className="mb-4">
+          <button
+            onClick={() => setShowCreateForm(!showCreateForm)}
+            className="bg-teal-700 text-white px-4 py-2 rounded"
+          >
+            {showCreateForm ? 'Cancel' : 'Add New Educator'}
+          </button>
+        </div>
+
+        {/* Create Educator Form */}
+        {showCreateForm && (
+          <div className="bg-white p-6 rounded shadow mb-8">
+            <h3 className="text-xl font-semibold mb-4 text-teal-700">Create New Educator</h3>
+            <form onSubmit={handleCreateEducator} className="space-y-4">
+              <div>
+                <label className="block mb-1 font-medium">Name:</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full border border-gray-300 p-2 rounded"
+                />
+              </div>
+              <div>
+                <label className="block mb-1 font-medium">Username:</label>
+                <input
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full border border-gray-300 p-2 rounded"
+                />
+              </div>
+              <div>
+                <label className="block mb-1 font-medium">Password:</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full border border-gray-300 p-2 rounded"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className={`bg-teal-700 text-white px-4 py-2 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                {loading ? 'Creating...' : 'Create Educator'}
+              </button>
+            </form>
+          </div>
+        )}
+
+        {/* Educators Table */}
+        <div>
+          <h3 className="text-xl font-semibold mb-4 text-teal-700">All Educators</h3>
+          {educators.length === 0 ? (
+            <p>No educators found.</p>
+          ) : (
+            <div className="overflow-x-auto bg-white rounded shadow">
+              <table className="min-w-full border-collapse">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="p-3 text-left border-b">Name</th>
+                    <th className="p-3 text-left border-b">Username</th>
+                    <th className="p-3 text-left border-b">Role</th>
+                    <th className="p-3 text-left border-b">Created At</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {educators.map((educator) => (
+                    <tr key={educator._id} className="border-b">
+                      <td className="p-3">{educator.name}</td>
+                      <td className="p-3">{educator.username}</td>
+                      <td className="p-3">{educator.role}</td>
+                      <td className="p-3">
+                        {new Date(educator.createdAt).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 };

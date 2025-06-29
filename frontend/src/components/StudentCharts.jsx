@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Line, Bar } from 'react-chartjs-2';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { Line, Bar } from "react-chartjs-2";
+import axios from "axios";
+import Conversations from "./Conversation";          // ⬅️ add path if different
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,7 +12,7 @@ import {
   Title,
   Tooltip,
   Legend,
-} from 'chart.js';
+} from "chart.js";
 
 ChartJS.register(
   CategoryScale,
@@ -24,105 +25,102 @@ ChartJS.register(
   Legend
 );
 
-const StudentCharts = ({ studentId }) => {
-  const [student, setStudent] = useState(null);
+const subjects    = ["maths", "science", "social"];
+const termLabels  = ["Term 1", "Term 2"];
+
+export default function StudentCharts({ studentId }) {
+  const [student,  setStudent]  = useState(null);
   const [averages, setAverages] = useState(null);
-  const subjects = ['maths', 'science', 'social'];
-  const termLabels = ['Term 1', 'Term 2'];
 
   useEffect(() => {
-    console.log('Fetching data for studentId:', studentId);
-    const fetchData = async () => {
+    if (!studentId) return;
+
+    (async () => {
       try {
-        const res = await axios.post(
-          'https://vision-global.onrender.com/educator/students/visualdata',
+        const { data } = await axios.post(
+          "https://vision-global.onrender.com/educator/students/visualdata",
           { studentId },
           { withCredentials: true }
         );
-
-        console.log('Student data:', res.data);
-
-        if (res.data.status === 'success') {
-          setStudent(res.data.data.student);
-          setAverages(res.data.data.averages);
+        if (data.status === "success") {
+          setStudent(data.data.student);
+          setAverages(data.data.averages);
         } else {
-          console.error('Failed to fetch student data:', res.data.message);
+          console.error("fetch failed:", data.message);
         }
-      } catch (error) {
-        console.error('Error fetching student or averages:', error);
+      } catch (err) {
+        console.error("error fetching visual data:", err);
       }
-    };
+    })();
+  }, [studentId]);
 
-    if (studentId) fetchData();
-  }, []);
+  if (!student || !averages) return <div className="text-center p-4">Loading charts…</div>;
 
-  if (!student || !averages) {
-    return <div className="text-center p-4">Loading charts...</div>;
-  }
-
-  const lineDatasets = subjects.map((subject) => ({
-    label: subject.charAt(0).toUpperCase() + subject.slice(1),
-    data: student.marks[subject],
-    borderColor: getColor(subject),
+  /* ---------- line chart ---------- */
+  const lineDatasets = subjects.map((s) => ({
+    label: s[0].toUpperCase() + s.slice(1),
+    data: student.marks[s],
+    borderColor: getColor(s),
     fill: false,
   }));
 
-  const lineData = {
-    labels: termLabels,
-    datasets: lineDatasets,
-  };
+  const lineData = { labels: termLabels, datasets: lineDatasets };
 
-  const studentLatestMarks = subjects.map((subject) => student.marks[subject]?.[1] || 0);
-  const schoolAverageMarks = subjects.map((subject) => averages.school[subject] || 0);
-  const overallAverageMarks = subjects.map((subject) => averages.overall[subject] || 0);
-
+  /* ---------- bar chart ---------- */
   const barData = {
     labels: subjects.map((s) => s.toUpperCase()),
     datasets: [
       {
-        label: 'Student',
-        data: studentLatestMarks,
-        backgroundColor: 'rgba(59, 130, 246, 0.6)', // blue-500
+        label: "Student",
+        data: subjects.map((s) => student.marks[s]?.[1] || 0),
+        backgroundColor: "rgba(59,130,246,0.6)",
       },
       {
-        label: 'School Avg',
-        data: schoolAverageMarks,
-        backgroundColor: 'rgba(234, 179, 8, 0.6)', // yellow-500
+        label: "School Avg",
+        data: subjects.map((s) => averages.school[s] || 0),
+        backgroundColor: "rgba(234,179,8,0.6)",
       },
       {
-        label: 'Overall Avg',
-        data: overallAverageMarks,
-        backgroundColor: 'rgba(34, 197, 94, 0.6)', // green-500
+        label: "Overall Avg",
+        data: subjects.map((s) => averages.overall[s] || 0),
+        backgroundColor: "rgba(34,197,94,0.6)",
       },
     ],
   };
 
   return (
     <div className="p-4 space-y-8">
-      <h2 className="text-2xl font-bold mb-2">Student Progress</h2>
-      <div className="bg-white rounded-xl p-4 shadow">
+      {/* progress */}
+      <section className="bg-white rounded-xl p-4 shadow">
+        <h2 className="text-2xl font-bold mb-4">Student Progress</h2>
         <Line data={lineData} />
-      </div>
+      </section>
 
-      <h2 className="text-2xl font-bold mt-6 mb-2">Comparison with Averages</h2>
-      <div className="bg-white rounded-xl p-4 shadow">
+      {/* comparison */}
+      <section className="bg-white rounded-xl p-4 shadow">
+        <h2 className="text-2xl font-bold mb-4">Comparison with Averages</h2>
         <Bar data={barData} />
-      </div>
+      </section>
+
+      {/* conversations */}
+      <section className="bg-white rounded-xl p-4 shadow">
+        <h2 className="text-2xl font-bold mb-4">Conversations</h2>
+        <Conversations studentId={studentId} />
+      </section>
     </div>
   );
-};
-
-function getColor(subject) {
-  switch (subject) {
-    case 'maths':
-      return 'rgba(59, 130, 246, 1)'; // blue-500
-    case 'science':
-      return 'rgba(234, 88, 12, 1)'; // orange-600
-    case 'social':
-      return 'rgba(132, 204, 22, 1)'; // lime-400
-    default:
-      return 'rgba(0, 0, 0, 1)';
-  }
 }
 
-export default StudentCharts;
+/* helper */
+function getColor(subject) {
+  switch (subject) {
+    case "maths":
+      return "rgba(59,130,246,1)";
+    case "science":
+      return "rgba(234,88,12,1)";
+    case "social":
+      return "rgba(132,204,22,1)";
+    default:
+      return "rgba(0,0,0,1)";
+  }
+}

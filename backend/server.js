@@ -8,14 +8,15 @@ const authRouter = require('./routes/api/auth');
 const userRouter = require('./routes/api/user');
 const adminRouter = require('./routes/api/admin');
 const educatorRouter = require('./routes/api/educator');
-
+const conversationRouter= require("./routes/api/convo")
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // MongoDB Atlas connection (removed deprecated options)
-mongoose.connect(process.env.MONGODB_URI)
+const uri = "mongodb+srv://sairiteshdomakuntla:rtz0tzNoz7flrOsa@cluster0.keuarrs.mongodb.net/"
+mongoose.connect(uri)
 .then(() => console.log('Connected to MongoDB Atlas'))
 .catch(err => console.error('MongoDB connection error:', err));
 
@@ -24,17 +25,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); 
 
-const whitelist = ['http://localhost:3000', 'http://localhost:5173','https://cfg-chi.vercel.app'];
+const whitelist = ['http://localhost:3000', 'http://localhost:5173'];
 // const credentials = (req, res, next) => {
-//   console.log('Req server:',req.headers.origin);
 //   const origin = req.headers.origin;
-//   //if (whitelist.indexOf(origin) !== -1) {
+//   if (whitelist.indexOf(origin) !== -1) {
 //     res.header('Access-Control-Allow-Credentials', 'true');
-//  // }
+//   }
 //   next();
 // };
-
-
 // app.use(credentials);
 
 const corsOptions = {
@@ -66,8 +64,9 @@ app.use('/auth', authRouter);
 app.use('/user', userRouter);
 app.use('/admin', adminRouter);
 app.use('/educator', educatorRouter);
+app.use("/api/conversations", conversationRouter);
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server is listening on port ${PORT}`);
+  console.log(`Server is listening on port ${PORT}`);
 });

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('../models/User');
+const StudentProfile = require('../models/StudentProfile');
 
 const getUserData = async (req, res) => {
     const { username } = req.body;
@@ -38,4 +39,31 @@ const getUserData = async (req, res) => {
     }
 }
 
-module.exports = { getUserData };
+const getData = async (req, res) => {
+    console.log("here pls")
+    const { username } = req.params;
+
+    try {
+        const user = await StudentProfile.findOne({username});
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+                status: "error"
+            });
+        }
+
+        res.status(200).json({
+            message: "User data retrieved successfully",
+            status: "success",
+            user
+        });
+    } catch (err) {
+        console.error("Error retrieving user data:", err);
+        return res.status(500).json({
+            message: "Internal server error",
+            status: "error"
+        });
+    }
+}
+
+module.exports = { getUserData, getData };
