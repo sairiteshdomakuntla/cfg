@@ -68,7 +68,7 @@ function App() {
           <div className='flex gap-2'>
 
             <button
-              onClick={() => setQuiz(true)}
+              onClick={() => setShowQuiz(true)}
               style={{
                 padding: "8px 16px",
                 backgroundColor: "white",
