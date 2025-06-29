@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import StudentDetails from './StudentDetails';
+import UploadFile from '../components/UploadFile';
 
 const EducatorDashboard = () => {
   const [students, setStudents] = useState([]);
@@ -83,6 +84,32 @@ const EducatorDashboard = () => {
   const handleBackToList = () => {
     setSelectedStudent(null);
   };
+
+  const handleReport = async (studentId) => {
+  try {
+    const response = await axios.get(`https://api.4rc.in/generate_pdf_report/${studentId}`, {
+      responseType: 'blob' // Important to get binary data
+    });
+
+    // Create a Blob from the PDF stream
+    const file = new Blob([response.data], { type: 'application/pdf' });
+
+    // Create a download link
+    const fileURL = URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = fileURL;
+    link.download = `report_${studentId}.pdf`; // Customize filename
+    document.body.appendChild(link);
+    link.click();
+
+    // Clean up
+    URL.revokeObjectURL(fileURL);
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error('Error generating report:', error);
+    setError('Failed to generate report');
+  }
+};
 
   // If a student is selected, show the student details page
   if (selectedStudent) {
@@ -336,7 +363,7 @@ const EducatorDashboard = () => {
                     <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>{student.email}</td>
                     <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>{student.age}</td>
                     <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>{student.class}</td>
-                    <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
+                    <td className='flex gap-4' style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
                       <button
                         onClick={() => handleViewStudentDetails(student._id)}
                         style={{
@@ -351,6 +378,20 @@ const EducatorDashboard = () => {
                       >
                         View Details
                       </button>
+                      <button
+                        onClick={() => handleReport(student.studentId)}
+                        style={{
+                          backgroundColor: '#008080',
+                          color: 'white',
+                          padding: '6px 12px',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '14px'
+                        }}
+                      >
+                        Get Report
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -358,6 +399,9 @@ const EducatorDashboard = () => {
             </table>
           </div>
         )}
+      </div>
+      <div className='mt-8'>
+        <UploadFile />
       </div>
     </div>
   );

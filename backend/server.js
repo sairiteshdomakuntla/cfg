@@ -15,8 +15,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // MongoDB Atlas connection (removed deprecated options)
-const uri = "mongodb+srv://sairiteshdomakuntla:rtz0tzNoz7flrOsa@cluster0.keuarrs.mongodb.net/"
-mongoose.connect(uri)
+mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log('Connected to MongoDB Atlas'))
 .catch(err => console.error('MongoDB connection error:', err));
 
@@ -25,19 +24,36 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); 
 
-// Single CORS configuration for production
-app.use(cors({
+const whitelist = ['http://localhost:3000', 'http://localhost:5173','https://cfg-chi.vercel.app'];
+// const credentials = (req, res, next) => {
+//   console.log('Req server:',req.headers.origin);
+//   const origin = req.headers.origin;
+//   //if (whitelist.indexOf(origin) !== -1) {
+//     res.header('Access-Control-Allow-Credentials', 'true');
+//  // }
+//   next();
+// };
+
+
+// app.use(credentials);
+
+const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    // Allow all origins for now (you can restrict this later)
-    return callback(null, true);
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
   },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
   optionsSuccessStatus: 200
+};
+
+app.use(cors({
+  origin: 'https://cfg-chi.vercel.app',
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  allowedHeaders: 'Content-Type,Authorization'
+
 }));
 
 // Basic route
@@ -54,5 +70,5 @@ app.use("/api/conversations", conversationRouter);
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server is listening on port ${PORT}`);
+  console.log(`Server is listening on port ${PORT}`);
 });

@@ -22,7 +22,7 @@ const login = async (req, res) => {
     try {
         const user = await User.findOne({ username });
         console.log('User found:', user ? 'Yes' : 'No'); // Debug log
-
+        
         if (!user) {
             return res.status(401).json({
                 message: "Invalid username or password",
@@ -32,7 +32,7 @@ const login = async (req, res) => {
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         console.log('Password valid:', isPasswordValid); // Debug log
-
+        
         if (!isPasswordValid) {
             return res.status(401).json({
                 message: "Invalid username or password",
@@ -88,8 +88,8 @@ const isAuthenticated = (req, res) => {
         return res.json({
             message: "User is authenticated",
             status: "success",
-            data: {
-                username: req.user.username,
+            data: { 
+                username: req.user.username, 
                 role: req.user.role,
                 name: req.user.name
             }
