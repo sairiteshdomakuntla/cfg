@@ -28,7 +28,7 @@ const Login = ({ onLoginSuccess }) => {
     // Add your login logic here
     try {
       setLoading(true);
-      const response = await axios.post('http://localhost:3000/auth/login', formData, {
+      const response = await axios.post('https://vision-global.onrender.com/auth/login', formData, {
         withCredentials: true
 
       });

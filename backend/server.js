@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); 
 
-const whitelist = ['http://localhost:3000', 'http://localhost:5173'];
+const whitelist = ['http://localhost:3000', 'http://localhost:5173',];
 const credentials = (req, res, next) => {
   const origin = req.headers.origin;
   if (whitelist.indexOf(origin) !== -1) {
@@ -60,5 +60,5 @@ app.use('/educator', educatorRouter);
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server is listening on port ${PORT}`);
+  console.log(`Server is listening on port ${PORT}`);
 });

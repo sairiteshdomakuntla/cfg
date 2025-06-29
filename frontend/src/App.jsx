@@ -16,7 +16,7 @@ function App() {
 
   const checkAuth = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/auth/is-auth', {
+      const response = await axios.get('https://vision-global.onrender.com/auth/is-auth', {
         withCredentials: true
       });
       if (response.data.status === 'success') {
@@ -31,7 +31,7 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      await axios.get('http://localhost:3000/auth/logout', {
+      await axios.get('https://vision-global.onrender.com/auth/logout', {
         withCredentials: true
       });
       setUser(null);

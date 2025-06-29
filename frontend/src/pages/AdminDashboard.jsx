@@ -19,7 +19,7 @@ const AdminDashboard = () => {
 
   const fetchEducators = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/admin/educators', {
+      const response = await axios.get('https://vision-global.onrender.com/admin/educators', {
         withCredentials: true
       });
       if (response.data.status === 'success') {
@@ -45,7 +45,7 @@ const AdminDashboard = () => {
     setSuccess(null);
 
     try {
-      const response = await axios.post('http://localhost:3000/admin/create-educator', formData, {
+      const response = await axios.post('https://vision-global.onrender.com/admin/create-educator', formData, {
         withCredentials: true
       });
 

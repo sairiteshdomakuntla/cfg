@@ -19,7 +19,7 @@ const StudentDetails = ({ studentId, onBack }) => {
   const fetchStudentDetails = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:3000/educator/students/${studentId}`, {
+      const response = await axios.get(`https://vision-global.onrender.com/educator/students/${studentId}`, {
         withCredentials: true
       });
 

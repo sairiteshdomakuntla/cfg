@@ -9,7 +9,7 @@ export const AppProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const getAuthStatus = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/auth/is_logged_in", {
+      const response = await axios.get("https://vision-global.onrender.com/auth/is-auth", {
         withCredentials: true,
       });
       if (response.data.status === "success") {

@@ -58,7 +58,7 @@ const Student = ({ studentId, username }) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:3000/educator/students/edit`,
+        `https://vision-global.onrender.com/educator/students/edit`,
         {
           studentId,
           school: form.school,

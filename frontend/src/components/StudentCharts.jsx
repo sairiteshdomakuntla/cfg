@@ -35,7 +35,7 @@ const StudentCharts = ({ studentId }) => {
     const fetchData = async () => {
       try {
         const res = await axios.post(
-          'http://localhost:3000/educator/students/visualdata',
+          'https://vision-global.onrender.com/educator/students/visualdata',
           { studentId },
           { withCredentials: true }
         );
