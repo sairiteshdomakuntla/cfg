@@ -26,6 +26,7 @@ app.use(cookieParser());
 
 const whitelist = ['http://localhost:3000', 'http://localhost:5173','https://cfg-chi.vercel.app'];
 const credentials = (req, res, next) => {
+  console.log('Req server:',req)
   const origin = req.headers.origin;
   if (whitelist.indexOf(origin) !== -1) {
     res.header('Access-Control-Allow-Credentials', 'true');
