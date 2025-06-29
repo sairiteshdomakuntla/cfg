@@ -25,18 +25,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); 
 
 const whitelist = ['http://localhost:3000', 'http://localhost:5173','https://cfg-chi.vercel.app'];
-const credentials = (req, res, next) => {
-  console.log('Req server:',req.headers.origin);
-  const origin = req.headers.origin;
-  //if (whitelist.indexOf(origin) !== -1) {
-    res.header('Access-Control-Allow-Credentials', 'true');
- // }
-  next();
-};
+// const credentials = (req, res, next) => {
+//   console.log('Req server:',req.headers.origin);
+//   const origin = req.headers.origin;
+//   //if (whitelist.indexOf(origin) !== -1) {
+//     res.header('Access-Control-Allow-Credentials', 'true');
+//  // }
+//   next();
+// };
 
-app.use
 
-app.use(credentials);
+// app.use(credentials);
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -50,10 +49,10 @@ const corsOptions = {
 };
 
 app.use(cors({
-  origin: '*',
+  origin: ['http://localhost:3000', 'http://localhost:5173','https://cfg-chi.vercel.app'],
   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  allowedHeaders: 'Content-Type,Authorization'
 }));
 
 // Basic route
