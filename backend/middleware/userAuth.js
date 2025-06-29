@@ -3,6 +3,7 @@ const User = require('../models/User');
 
 const userAuth = async (req, res, next) => {
     const token = req.cookies.token || req.headers['authorization']?.split(' ')[1];
+    console.log('Token:', token); // Debugging line to check the token value
     if (!token) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
